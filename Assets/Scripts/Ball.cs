@@ -5,9 +5,15 @@ using Zenject;
 
 public class Ball : MonoBehaviour
 {
-
-    [Inject(Id = "ChangeMoneySignal")]
+    [Inject]
     private SignalBus _signalBus;
+
+    [Inject]
+    public void Constructor(SignalBus signalBus)
+    {
+        _signalBus = signalBus;
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     { 
         if (collision.gameObject.CompareTag("Result"))
@@ -20,7 +26,7 @@ public class Ball : MonoBehaviour
                 return;
             }
 
-            _signalBus.Fire(dropChance);
+            _signalBus.FireId("ChangeMoneySignal",dropChance);
             gameObject.SetActive(false);
         }
     }

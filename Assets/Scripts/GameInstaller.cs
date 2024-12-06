@@ -9,12 +9,16 @@ public class GameInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
-        SignalBusInstaller.Install(Container);
+        Debug.Log("Installing Bindings...");
 
+        SignalBusInstaller.Install(Container);
         Container.DeclareSignal<float>().WithId("ChangeMoneySignal");
+        Debug.Log("Signal declared.");
 
         Container.Bind<GameManager>().FromInstance(gameManager).AsSingle();
         Container.Bind<HistoryPanel>().FromInstance(historyPanel).AsSingle();
         Container.Bind<Ball>().FromInstance(ball).AsSingle();
+
+        Debug.Log("Bindings installed in GameInstaller.");
     }
 }

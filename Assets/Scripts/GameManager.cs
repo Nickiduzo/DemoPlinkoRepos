@@ -29,13 +29,25 @@ public class GameManager : MonoBehaviour
     private float[] bets = new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 1.2f, 2.0f, 4.0f, 10f, 20f, 50f, 100f};
     private int currentIndex = 0;
 
-    [Inject(Id = "ChangeMoneySignal")]
+    [Inject]
     private SignalBus _signalBus;
-    private void Awake()
+
+    [Inject]
+    public void Constructor(SignalBus signalBus)
     {
+        _signalBus = signalBus;
+    }    
+
+    private void Start()
+    {
+        if (_signalBus == null)
+        {
+            Debug.LogError("SignalBus is null in GameManager!");
+        }
+
         Initialization();
 
-        _signalBus.Subscribe<float>(ChangeMoneyAmount);
+        _signalBus.SubscribeId<float>("ChangeMoneySignal", ChangeMoneyAmount);
     }
 
     private void Update()
@@ -150,8 +162,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
-       _signalBus.Unsubscribe<float>(ChangeMoneyAmount);
+       _signalBus?.UnsubscribeId<float>("ChangeMoneySignal", ChangeMoneyAmount);
     }
 }

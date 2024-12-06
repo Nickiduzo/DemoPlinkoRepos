@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using Zenject;
 
@@ -20,11 +19,23 @@ public class HistoryPanel : MonoBehaviour
 
     private List<GameObject> history = new List<GameObject>();
 
-    [Inject(Id = "ChangeMoneySignal")]
+    [Inject]
     private SignalBus _signalBus;
-    private void Awake()
+
+    [Inject]
+    public void Constructor(SignalBus signalBus)
     {
-        _signalBus.Subscribe<float>(AddToHistoryPanel);
+        _signalBus = signalBus;
+    }
+
+    private void Start()
+    {
+        if (_signalBus == null)
+        {
+            Debug.LogError("SignalBus is null in HistoryPanel!");
+        }
+
+        _signalBus.SubscribeId<float>("ChangeMoneySignal", AddToHistoryPanel);
     }
 
     private void AddToHistoryPanel(float value)
@@ -61,8 +72,8 @@ public class HistoryPanel : MonoBehaviour
         history.Add(element);
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
-        _signalBus.Unsubscribe<float>(AddToHistoryPanel);
+        _signalBus.UnsubscribeId<float>("ChangeMoneySignal", AddToHistoryPanel);
     }
 }
